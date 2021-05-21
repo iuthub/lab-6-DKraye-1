@@ -4,7 +4,9 @@
 	$text="";
 	$replaceText="";
 	$replacedText="";
-
+	$contains=true;
+	$phone=true;
+	$email=true;
 	$match="Not checked yet.";
 
 if ($_SERVER["REQUEST_METHOD"]=="POST") {
@@ -13,6 +15,10 @@ if ($_SERVER["REQUEST_METHOD"]=="POST") {
 	$replaceText=$_POST["replaceText"];
 
 	$replacedText=preg_replace($pattern, $replaceText, $text);
+    $contains = preg_match("/{$text}/i", $pattern);
+    $phone = preg_match('/(\+998\-)[0-9]{2}(\-)[0-9]{3}(\-)[0-9]{4}/', $text);
+    $email = preg_match('/(.*)(@)(.*)/', $text);
+
 
 	if(preg_match($pattern, $text)) {
 						$match="Match!";
@@ -33,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"]=="POST") {
 <body>
 	<form action="regex_valid_form.php" method="post">
 		<dl>
-			<dt>Pattern</dt>
+			<dt>Pattern - Use: (/\s+/ - for removing whitespaces; /[^0-9,.]/ - remove nonnumeric chars; /[^a-zA-Z]/ - extract text)</dt>
 			<dd><input type="text" name="pattern" value="<?= $pattern ?>"></dd>
 
 			<dt>Text</dt>
@@ -44,11 +50,13 @@ if ($_SERVER["REQUEST_METHOD"]=="POST") {
 
 			<dt>Output Text</dt>
 			<dd><?=	$match ?></dd>
+            <dd><?php print $contains ? 'Pattern Contains word '.$text : 'Pattern do not contains '.$text?></dd>
+            <dd><?php print $phone ? 'Is a phone number' : 'Is not a phone number'?></dd>
+            <dd><?php print $email ? 'Is a mail' : 'Is not a mail'?></dd>
 
-			<dt>Replaced Text</dt>
-			<dd> <code><?=	$replacedText ?></code></dd>
-
-			<dt>&nbsp;</dt>
+            <dt>Replaced Text</dt>
+            <dd> <code><?=	$replacedText ?></code></dd>
+            <dt>&nbsp;</dt>
 			<dd><input type="submit" value="Check"></dd>
 		</dl>
 
